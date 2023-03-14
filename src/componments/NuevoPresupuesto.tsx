@@ -6,7 +6,9 @@ import {
   TextInput,
   Pressable,
   GestureResponderEvent,
+  Alert,
 } from 'react-native';
+import globalStyles from '../styles';
 
 interface IProps {
   savePresupuesto: (monto: number) => void;
@@ -16,22 +18,31 @@ const NuevoPresupuesto = (props: PropsWithChildren<IProps>) => {
   const [presupuesto, setPresupuesto] = useState<string>('');
 
   const onPressPresupuesto = (event: GestureResponderEvent) => {
-    try {
-      const presu = Number(presupuesto);
+    const presu = Number(presupuesto);
+    if (presu > 0) {
       props.savePresupuesto(presu);
-    } catch (ex) {}
+    } else if (isNaN(presu)) {
+      Alert.alert('Error', 'El valor debe ser un numero', [{text: 'Cerrar'}]);
+    } else {
+      Alert.alert('Error', 'El valor debe ser un numero positivo', [
+        {text: 'Cerrar'},
+      ]);
+    }
   };
   return (
     <View style={styles.contenedor}>
-      <Text>Definir nuevo presupuesto</Text>
+      <Text style={styles.label}>Definir nuevo presupuesto</Text>
       <TextInput
+        style={styles.input}
+        keyboardType="numeric"
+        placeholder="Agrega tu presupuesto"
         value={presupuesto}
         onChangeText={value => {
           setPresupuesto(value);
         }}
       />
-      <Pressable onPress={onPressPresupuesto}>
-        <Text>Agregar presupuesto</Text>
+      <Pressable style={styles.btnAgregar} onPress={onPressPresupuesto}>
+        <Text style={styles.btnTextoAgregar}>Agregar presupuesto</Text>
       </Pressable>
     </View>
   );
@@ -39,20 +50,31 @@ const NuevoPresupuesto = (props: PropsWithChildren<IProps>) => {
 
 const styles = StyleSheet.create({
   contenedor: {
-    backgroundColor: '#FFF',
-    marginHorizontal: 10,
-    marginVertical: 20,
-    padding: 20,
+    ...globalStyles.contenedor,
+  },
+  label: {
+    textAlign: 'center',
+    fontSize: 24,
+    color: '#3b82f6',
+  },
+  input: {
+    marginTop: 30,
+    backgroundColor: '#F5F5f5',
+    padding: 10,
     borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-    transform: [{translateY: 50}],
+    textAlign: 'center',
+  },
+  btnAgregar: {
+    marginTop: 30,
+    borderRadius: 10,
+    backgroundColor: 'orange',
+    padding: 10,
+  },
+  btnTextoAgregar: {
+    color: '#FFF',
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    fontWeight: '600',
   },
 });
 
