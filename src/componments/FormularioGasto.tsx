@@ -1,6 +1,7 @@
 import {Picker} from '@react-native-picker/picker';
 import React, {PropsWithChildren, useEffect, useState} from 'react';
 import {
+  Alert,
   Modal,
   Pressable,
   SafeAreaView,
@@ -9,7 +10,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import {TipoGasto} from '../Enums/TipoGastoEnum';
+import {tipoGasto} from '../Enums/TipoGastoEnum';
 import {IGasto} from '../interfaces/IGasto';
 import globalStyles from '../styles';
 
@@ -30,12 +31,24 @@ const FormularioGasto = (props: PropsWithChildren<IProps>) => {
   const [gasto, setGasto] = useState<IGasto>(initGasto);
 
   const handleAgregarOEditarGasto = () => {
-    const isEdit = props.gasto !== undefined;
-    let gastoEditado = {...gasto};
-    if (!isEdit) {
-      gastoEditado.id = new Date().getTime().toString();
+    const {nombre, tipo, total} = gasto;
+    const valuesEmpty = Object.values({
+      nombre,
+      tipo,
+    }).includes('');
+
+    if (!valuesEmpty && total > 0) {
+      const isEdit = props.gasto !== undefined;
+      const gastoEditado = {
+        ...gasto,
+        id: isEdit ? gasto.id : new Date().getTime().toString(),
+      };
+      props.agregarOEditarGasto(gastoEditado, isEdit);
+    } else {
+      Alert.alert('Error', 'Todos los campos son obligatorios', [
+        {text: 'Cerrar'},
+      ]);
     }
-    props.agregarOEditarGasto(gastoEditado, isEdit);
   };
 
   useEffect(() => {
@@ -93,32 +106,23 @@ const FormularioGasto = (props: PropsWithChildren<IProps>) => {
           <View style={styles.campo}>
             <Text style={styles.label}>Categoria Gasto</Text>
             <Picker
-              selectedValue={
-                gasto.tipo /*TipoGasto[gasto.tipo as keyof typeof TipoGasto]*/
-              }
+              selectedValue={gasto.tipo}
               onValueChange={(itemValue, itemIndex) => {
                 setGasto({
                   ...gasto,
-                  tipo: itemValue /*TipoGasto[itemValue as keyof typeof TipoGasto]*/,
+                  tipo: itemValue,
                 });
               }}>
               <Picker.Item label="-- Seleccione --" value="" />
-              {
-                // Object.keys(TipoGasto).map(item => {
-                //   return (
-                //     <Picker.Item
-                //       label={TipoGasto[item as keyof typeof TipoGasto]}
-                //       value={item}
-                //     />
-                //   );
-                // })
-              }
-              <Picker.Item label="Ahorro" value="Ahorro" />
-              <Picker.Item label="Comida" value="Comida" />
-              <Picker.Item label="Gastos Varios" value="Gastos Varios" />
-              <Picker.Item label="Ocio" value="Ocio" />
-              <Picker.Item label="Salud" value="Salud" />
-              <Picker.Item label="Subscripciones" value="Subscripciones" />
+              {tipoGasto.map((item, index) => {
+                return (
+                  <Picker.Item
+                    label={item.label}
+                    value={item.value}
+                    key={index}
+                  />
+                );
+              })}
             </Picker>
           </View>
 

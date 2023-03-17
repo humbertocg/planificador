@@ -11,6 +11,7 @@ import {
 import ControlPresupuesto from './src/componments/ControlPresupuesto';
 import FormularioGasto from './src/componments/FormularioGasto';
 import Header from './src/componments/Header';
+import ListadoGastos from './src/componments/ListadoGastos';
 import NuevoPresupuesto from './src/componments/NuevoPresupuesto';
 import {IGasto} from './src/interfaces/IGasto';
 
@@ -43,30 +44,35 @@ const App = () => {
 
   return (
     <View style={styles.contenedor}>
-      <View style={styles.header}>
-        <Header />
+      <ScrollView>
+        <View style={styles.header}>
+          <Header />
 
-        {presupuesto === 0 ? (
-          <NuevoPresupuesto savePresupuesto={savePresupuesto} />
-        ) : (
-          <ControlPresupuesto presupuesto={presupuesto} gastos={gastos} />
+          {presupuesto === 0 ? (
+            <NuevoPresupuesto savePresupuesto={savePresupuesto} />
+          ) : (
+            <ControlPresupuesto presupuesto={presupuesto} gastos={gastos} />
+          )}
+        </View>
+
+        {agregarOEditarGastoModal && (
+          <FormularioGasto
+            isVisible={agregarOEditarGastoModal}
+            gasto={gastoEditar}
+            onDismissModal={() => {
+              setGastoEditar(undefined);
+              setAgregarOEditarGastoModal(false);
+            }}
+            agregarOEditarGasto={agregarOEditarGasto}
+          />
         )}
-      </View>
+        {presupuesto > 0 && (
+          <View style={styles.contenedorListado}>
+            <ListadoGastos gastos={gastos} />
+          </View>
+        )}
 
-      {agregarOEditarGastoModal && (
-        <FormularioGasto
-          isVisible={agregarOEditarGastoModal}
-          gasto={gastoEditar}
-          onDismissModal={() => {
-            setGastoEditar(undefined);
-            setAgregarOEditarGastoModal(false);
-          }}
-          agregarOEditarGasto={agregarOEditarGasto}
-        />
-      )}
-
-      <ScrollView style={styles.scrollViewStyle}>
-        <View style={styles.containerScroll}></View>
+        {/*<View style={styles.containerScroll}></View>*/}
       </ScrollView>
 
       {presupuesto > 0 && (
@@ -92,6 +98,9 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: '#3B82F6',
+  },
+  contenedorListado: {
+    marginTop: 30,
   },
   scrollViewStyle: {
     marginTop: 30,
