@@ -1,5 +1,6 @@
 import React, {PropsWithChildren, useEffect, useState} from 'react';
-import {Image, StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
+import CircularProgress from 'react-native-circular-progress-indicator';
 import {formatearCantidad} from '../helpers';
 import {IGasto} from '../interfaces/IGasto';
 import globalStyles from '../styles';
@@ -25,7 +26,18 @@ const ControlPresupuesto = (props: PropsWithChildren<IProps>) => {
   return (
     <View style={styles.contenedor}>
       <View style={styles.centrarGrafica}>
-        <Image style={styles.imagen} source={require('../img/grafico.jpg')} />
+        <CircularProgress
+          value={(gastado / props.presupuesto) * 100}
+          radius={150}
+          valueSuffix={'%'}
+          title="Gastado"
+          inActiveStrokeColor="#f5f5f5"
+          inActiveStrokeWidth={20}
+          activeStrokeColor="#3b82f6"
+          activeStrokeWidth={20}
+          titleStyle={{fontWeight: 'bold', fontSize: 20}}
+          titleColor="#64748B"
+        />
 
         <View style={styles.contenedorTextos}>
           <Text style={styles.valor}>
@@ -60,7 +72,7 @@ const styles = StyleSheet.create({
     width: 250,
   },
   contenedorTextos: {marginTop: 50},
-  valor: {fontSize: 24, textAlign: 'center', marginBottom: 10},
+  valor: {fontSize: 24, textAlign: 'center', marginBottom: 10, color: '#000'},
   label: {fontWeight: '700', color: '#3B82F6'},
 });
 

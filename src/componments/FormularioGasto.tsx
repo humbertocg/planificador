@@ -25,6 +25,7 @@ const initGasto: IGasto = {
   nombre: '',
   tipo: '',
   total: 0,
+  fecha: new Date(),
 };
 
 const FormularioGasto = (props: PropsWithChildren<IProps>) => {
@@ -42,6 +43,7 @@ const FormularioGasto = (props: PropsWithChildren<IProps>) => {
       const gastoEditado = {
         ...gasto,
         id: isEdit ? gasto.id : new Date().getTime().toString(),
+        fecha: new Date(),
       };
       props.agregarOEditarGasto(gastoEditado, isEdit);
     } else {
@@ -73,12 +75,15 @@ const FormularioGasto = (props: PropsWithChildren<IProps>) => {
         </View>
 
         <View style={styles.formulario}>
-          <Text style={styles.titulo}>Nuevo Gasto</Text>
+          <Text style={styles.titulo}>
+            {props.gasto !== undefined ? 'Editar' : 'Nuevo'} {''}Gasto
+          </Text>
 
           <View style={styles.campo}>
             <Text style={styles.label}>Nombre Gasto</Text>
             <TextInput
               style={styles.input}
+              placeholderTextColor="#ACADA8"
               placeholder="Nombre del gasto. ej Comida"
               value={gasto.nombre}
               onChangeText={value => setGasto({...gasto, nombre: value})}
@@ -89,12 +94,13 @@ const FormularioGasto = (props: PropsWithChildren<IProps>) => {
             <Text style={styles.label}>Cantidad Gasto</Text>
             <TextInput
               style={styles.input}
+              placeholderTextColor="#ACADA8"
               placeholder="cantidad del gasto"
               keyboardType="numeric"
               value={gasto.total === 0 ? '' : gasto.total.toString()}
               onChangeText={value => {
                 const totalValue = Number(value);
-                if (totalValue > 0) {
+                if (totalValue >= 0) {
                   setGasto({...gasto, total: totalValue});
                 } else if (isNaN(totalValue)) {
                   setGasto({...gasto, total: 0});
@@ -106,6 +112,7 @@ const FormularioGasto = (props: PropsWithChildren<IProps>) => {
           <View style={styles.campo}>
             <Text style={styles.label}>Categoria Gasto</Text>
             <Picker
+              style={styles.pickerStyle}
               selectedValue={gasto.tipo}
               onValueChange={(itemValue, itemIndex) => {
                 setGasto({
@@ -169,6 +176,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     marginTop: 10,
+    color: '#000',
   },
   submitBtn: {
     backgroundColor: '#3b82f6',
@@ -197,6 +205,9 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     fontWeight: 'bold',
     color: '#FFF',
+  },
+  pickerStyle: {
+    color: '#000',
   },
 });
 

@@ -5,4 +5,5 @@ export interface IGasto {
   nombre: string;
   tipo: string;
   total: number;
+  fecha: Date;
 }

@@ -34,6 +34,7 @@ const NuevoPresupuesto = (props: PropsWithChildren<IProps>) => {
       <Text style={styles.label}>Definir nuevo presupuesto</Text>
       <TextInput
         style={styles.input}
+        placeholderTextColor="#ACADA8"
         keyboardType="numeric"
         placeholder="Agrega tu presupuesto"
         value={presupuesto}

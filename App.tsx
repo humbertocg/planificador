@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {
+  Alert,
   Image,
   Modal,
   Pressable,
@@ -9,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import ControlPresupuesto from './src/componments/ControlPresupuesto';
+import Filtro from './src/componments/Filtro';
 import FormularioGasto from './src/componments/FormularioGasto';
 import Header from './src/componments/Header';
 import ListadoGastos from './src/componments/ListadoGastos';
@@ -21,6 +23,8 @@ const App = () => {
   const [agregarOEditarGastoModal, setAgregarOEditarGastoModal] =
     useState(false);
   const [gastoEditar, setGastoEditar] = useState<IGasto>();
+  const [filtro, setFiltro] = useState('');
+  const [gastosFiltrados, setGastosFiltrados] = useState<IGasto[]>([]);
 
   const savePresupuesto = (value: number) => {
     setPresupuesto(value);
@@ -42,6 +46,28 @@ const App = () => {
     setAgregarOEditarGastoModal(false);
   };
 
+  const onEditGasto = (gasto: IGasto) => {
+    setGastoEditar(gasto);
+    setAgregarOEditarGastoModal(true);
+  };
+
+  const onDeleteGasto = (id: string) => {
+    const gastosFiltrado = gastos.filter(gasto => gasto.id !== id);
+    setGastos(gastosFiltrado);
+  };
+
+  const onChangeTipoGasto = (tipoGasto: string) => {
+    setFiltro(tipoGasto);
+  };
+
+  useEffect(() => {
+    let gastosFiltrado = gastos;
+    if (filtro !== '') {
+      gastosFiltrado = gastos.filter(gasto => gasto.tipo === filtro);
+    }
+    setGastosFiltrados(gastosFiltrado);
+  }, [filtro, gastos]);
+
   return (
     <View style={styles.contenedor}>
       <ScrollView>
@@ -54,26 +80,36 @@ const App = () => {
             <ControlPresupuesto presupuesto={presupuesto} gastos={gastos} />
           )}
         </View>
-
-        {agregarOEditarGastoModal && (
-          <FormularioGasto
-            isVisible={agregarOEditarGastoModal}
-            gasto={gastoEditar}
-            onDismissModal={() => {
-              setGastoEditar(undefined);
-              setAgregarOEditarGastoModal(false);
-            }}
-            agregarOEditarGasto={agregarOEditarGasto}
-          />
-        )}
-        {presupuesto > 0 && (
+        {presupuesto > 0 ? (
           <View style={styles.contenedorListado}>
-            <ListadoGastos gastos={gastos} />
+            <Filtro onChangeTipoGasto={onChangeTipoGasto} />
+            <ListadoGastos
+              gastos={gastosFiltrados}
+              onEditGasto={onEditGasto}
+              onDeleteGasto={onDeleteGasto}
+            />
           </View>
+        ) : (
+          /**
+           * hack for transform in android,if there is the only component with traslateY to be able to render the complete component
+           */
+          <View style={styles.nuevoPresupuestoViewShadow}></View>
         )}
 
         {/*<View style={styles.containerScroll}></View>*/}
       </ScrollView>
+
+      {agregarOEditarGastoModal && (
+        <FormularioGasto
+          isVisible={agregarOEditarGastoModal}
+          gasto={gastoEditar}
+          onDismissModal={() => {
+            setGastoEditar(undefined);
+            setAgregarOEditarGastoModal(false);
+          }}
+          agregarOEditarGasto={agregarOEditarGasto}
+        />
+      )}
 
       {presupuesto > 0 && (
         <Pressable
@@ -99,6 +135,7 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: '#3B82F6',
   },
+  nuevoPresupuestoViewShadow: {height: 50},
   contenedorListado: {
     marginTop: 30,
   },
@@ -111,15 +148,15 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   agregarGastoBtn: {
-    height: 60,
-    width: 60,
+    height: 45,
+    width: 45,
     position: 'absolute',
     bottom: 40,
     right: 20,
   },
   agregarGastoImg: {
-    height: 60,
-    width: 60,
+    height: 45,
+    width: 45,
   },
 });
 
