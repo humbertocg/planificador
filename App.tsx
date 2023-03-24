@@ -1,14 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {
-  Alert,
-  Image,
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import {Image, Pressable, ScrollView, StyleSheet, View} from 'react-native';
+import {CacheData, LocalKeyStorage} from './src/Cache';
 import ControlPresupuesto from './src/componments/ControlPresupuesto';
 import Filtro from './src/componments/Filtro';
 import FormularioGasto from './src/componments/FormularioGasto';
@@ -61,12 +53,73 @@ const App = () => {
   };
 
   useEffect(() => {
+    const obtenerPresupuesto = async () => {
+      const presupuestoStorage = await CacheData.ObtenerDato(
+        LocalKeyStorage.presupuesto,
+      );
+      if (presupuestoStorage !== null) {
+        setPresupuesto(Number(presupuestoStorage));
+      }
+    };
+    obtenerPresupuesto();
+  }, []);
+
+  useEffect(() => {
+    const obtenerGastos = async () => {
+      const gastosStorage = await CacheData.ObtenerDato(LocalKeyStorage.gastos);
+      if (gastosStorage !== null) {
+        setGastos(JSON.parse(gastosStorage));
+      }
+    };
+    obtenerGastos();
+  }, []);
+
+  useEffect(() => {
+    const obtenerFiltro = async () => {
+      const filtroStorage = await CacheData.ObtenerDato(LocalKeyStorage.filtro);
+      if (filtroStorage !== null) {
+        setFiltro(filtroStorage);
+      }
+    };
+    obtenerFiltro();
+  }, []);
+
+  useEffect(() => {
     let gastosFiltrado = gastos;
     if (filtro !== '') {
       gastosFiltrado = gastos.filter(gasto => gasto.tipo === filtro);
     }
     setGastosFiltrados(gastosFiltrado);
   }, [filtro, gastos]);
+
+  useEffect(() => {
+    if (presupuesto > 0) {
+      const guardarPresupuesto = async () => {
+        await CacheData.GuardarDato(
+          LocalKeyStorage.presupuesto,
+          presupuesto.toString(),
+        );
+      };
+      guardarPresupuesto();
+    }
+  }, [presupuesto]);
+
+  useEffect(() => {
+    const guardarFiltro = async () => {
+      await CacheData.GuardarDato(LocalKeyStorage.filtro, filtro);
+    };
+    guardarFiltro();
+  }, [filtro]);
+
+  useEffect(() => {
+    const guardarGastos = async () => {
+      await CacheData.GuardarDato(
+        LocalKeyStorage.gastos,
+        JSON.stringify(gastos),
+      );
+    };
+    guardarGastos();
+  }, [gastos]);
 
   return (
     <View style={styles.contenedor}>
@@ -82,7 +135,7 @@ const App = () => {
         </View>
         {presupuesto > 0 ? (
           <View style={styles.contenedorListado}>
-            <Filtro onChangeTipoGasto={onChangeTipoGasto} />
+            <Filtro filtro={filtro} onChangeTipoGasto={onChangeTipoGasto} />
             <ListadoGastos
               gastos={gastosFiltrados}
               onEditGasto={onEditGasto}

@@ -1,15 +1,21 @@
-import React, {PropsWithChildren, useState} from 'react';
+import React, {PropsWithChildren, useEffect, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import globalStyles from '../styles';
 import {tipoGasto} from '../Enums/TipoGastoEnum';
 
 interface IProps {
+  filtro: string;
   onChangeTipoGasto: (tipoGasto: string) => void;
 }
 
 const Filtro = (props: PropsWithChildren<IProps>) => {
   const [tipoGastoSelected, setTipoGastoSelected] = useState('');
+
+  useEffect(() => {
+    setTipoGastoSelected(props.filtro);
+  }, [props.filtro]);
+
   return (
     <View style={styles.contenedor}>
       <Text style={styles.label}>Filtrar gastos</Text>
