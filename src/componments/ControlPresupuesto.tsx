@@ -1,5 +1,5 @@
 import React, {PropsWithChildren, useEffect, useState} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {Pressable, StyleSheet, Text, View} from 'react-native';
 import CircularProgress from 'react-native-circular-progress-indicator';
 import {formatearCantidad} from '../helpers';
 import {IGasto} from '../interfaces/IGasto';
@@ -8,6 +8,7 @@ import globalStyles from '../styles';
 interface IProps {
   presupuesto: number;
   gastos: IGasto[];
+  handlerClearApp: () => void;
 }
 
 const ControlPresupuesto = (props: PropsWithChildren<IProps>) => {
@@ -40,6 +41,12 @@ const ControlPresupuesto = (props: PropsWithChildren<IProps>) => {
         />
 
         <View style={styles.contenedorTextos}>
+          <Pressable
+            style={styles.btnClearPresupuesto}
+            onPress={props.handlerClearApp}>
+            <Text style={styles.btnClearPresupuestoTexto}>Reiniciar App</Text>
+          </Pressable>
+
           <Text style={styles.valor}>
             <Text style={styles.label}>Presupuesto:</Text>{' '}
             {`${formatearCantidad(props.presupuesto)}`}
@@ -67,13 +74,21 @@ const styles = StyleSheet.create({
   centrarGrafica: {
     alignItems: 'center',
   },
-  imagen: {
-    height: 250,
-    width: 250,
-  },
   contenedorTextos: {marginTop: 50},
   valor: {fontSize: 24, textAlign: 'center', marginBottom: 10, color: '#000'},
   label: {fontWeight: '700', color: '#3B82F6'},
+  btnClearPresupuesto: {
+    backgroundColor: '#DB2777',
+    padding: 10,
+    marginBottom: 20,
+    borderRadius: 5,
+  },
+  btnClearPresupuestoTexto: {
+    textAlign: 'center',
+    color: '#FFF',
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+  },
 });
 
 export default ControlPresupuesto;

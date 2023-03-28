@@ -1,5 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {Image, Pressable, ScrollView, StyleSheet, View} from 'react-native';
+import {
+  Alert,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
 import {CacheData, LocalKeyStorage} from './src/Cache';
 import ControlPresupuesto from './src/componments/ControlPresupuesto';
 import Filtro from './src/componments/Filtro';
@@ -52,6 +59,30 @@ const App = () => {
     setFiltro(tipoGasto);
   };
 
+  const handlerClearApp = () => {
+    Alert.alert(
+      'Reiniciar presupuesto',
+      'Se perderan los gastos y el presupuesto ¿desea continuar?',
+      [
+        {text: 'No', style: 'cancel'},
+        {
+          text: 'Si, reiniciar',
+          onPress: () => {
+            const clearApp = async () => {
+              await CacheData.Limpiar();
+              setPresupuesto(0);
+              setGastos([]);
+              setGastosFiltrados([]);
+              setGastoEditar(undefined);
+              setFiltro('');
+            };
+            clearApp();
+          },
+        },
+      ],
+    );
+  };
+
   useEffect(() => {
     const obtenerPresupuesto = async () => {
       const presupuestoStorage = await CacheData.ObtenerDato(
@@ -68,7 +99,9 @@ const App = () => {
     const obtenerGastos = async () => {
       const gastosStorage = await CacheData.ObtenerDato(LocalKeyStorage.gastos);
       if (gastosStorage !== null) {
-        setGastos(JSON.parse(gastosStorage));
+        try {
+          setGastos(JSON.parse(gastosStorage));
+        } catch (err) {}
       }
     };
     obtenerGastos();
@@ -130,7 +163,11 @@ const App = () => {
           {presupuesto === 0 ? (
             <NuevoPresupuesto savePresupuesto={savePresupuesto} />
           ) : (
-            <ControlPresupuesto presupuesto={presupuesto} gastos={gastos} />
+            <ControlPresupuesto
+              presupuesto={presupuesto}
+              gastos={gastos}
+              handlerClearApp={handlerClearApp}
+            />
           )}
         </View>
         {presupuesto > 0 ? (
